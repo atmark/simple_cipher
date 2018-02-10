@@ -16,7 +16,7 @@ Running
      
      mvn clean install -DskipTests
      
- Run in a with embeded server tomcat:
+ Run with embeded server tomcat:
  
      mvn spring-boot:run
      
