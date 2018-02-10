@@ -12,7 +12,7 @@ Running
      
  On first setup this will download all the dependencies of the project.
      
- (Optional )Skipping unit tests
+ (Optional)Skipping unit tests
      
      mvn clean install -DskipTests
      
