@@ -27,3 +27,5 @@ Running
  Once started, the application should be available at:
  
      http://localhost:8081
+     
+ Embedded console of h2DB is enabled by default in this application, see `http://localhost:8081/h2-console`. Then, change JDBC URL to `jdbc:h2:file:./data/cipher_db`, other should be as is, everything is set using default values. 
