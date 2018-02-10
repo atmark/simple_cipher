@@ -1,5 +1,5 @@
 # SIMPLE CIPHER APP
-A simple cipher app that performs Caesar and Vigenère Cipher. Build with springboot and springboot default database H2DB, with Thymleaf for frontent
+A simple cipher app that performs Caesar and Vigenère Cipher. Build with springboot and springboot default database H2DB, with Thymleaf for frontend
 
 Environment should have `java` and `maven` pre installed.
 
