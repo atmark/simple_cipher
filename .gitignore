@@ -1,0 +1,11 @@
+*.iml
+.idea/
+*/target/**
+*/target/*
+/target/**
+/target/*
+
+*/data/**
+*/data/*
+/data/**
+/data/*

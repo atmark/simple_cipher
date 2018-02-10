@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Home Page</title>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"/>
+        <link rel="stylesheet" href="/static/style.css" />
+    </head>
+
+    <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#" th:text="${appName}"></a>
+                </div>
+                <div id="navbar" class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="#">Home</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <main role="main" class="container">
+                <h1 class="mt-5">Test Name 1112345</h1>
+                <div class="alert alert-success alert-message" th:if="${globalMessage}" th:text="${globalMessage}">Some Success message</div>
+                <div class="alert alert-error alert-message" th:if="${globalMessageError}" th:text="${globalMessageError}">Some Error message</div>
+
+                <form th:action="@{/save}"
+                      th:object="${cipherForm}" action="#" method="post">
+
+                    <div class="form-row row">
+                        <div class="form-group col-md-3">
+                            <label>Cipher Scheme</label>
+                            <select class="form-control" name="cipherType" id="cipherType">
+                                <option value="" selected="" disabled="">Please select</option>
+                                <option value="CAESAR-SHIFT">Caesar - Shift</option>
+                                <option value="CAESAR-MONO">Caesar - Mono</option>
+                                <option value="VIGENER">Vigenère</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>Key</label>
+                            <input id="keyInput" name="key" disabled="" type="text" class="form-control" placeholder=""/>
+                        </div>
+                    </div>
+
+                    <div class="form-row row">
+                        <div class="form-group col-md-8">
+                            <label>Plain Text</label>
+                            <input name="plainText" class="form-control" rows="5" pattern="[a-zA-Z]+" maxlength="255" required="" title="Enter alphabet only"/>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Encrypt and Save</button>
+                </form>
+
+                <hr/>
+                <form th:action="@{/retrieve}" th:object="${cipherEntry}" action="#" method="post">
+                    <button id="" class="btn btn-primary" value="list" type="submit">Retrieve</button>
+                    <button id="bruteForceButton" class="btn btn-primary" type="button">Brute Force Attack</button>
+                </form>
+                <hr/>
+                <div id="lastEntryForm" class="form-row row"  th:if="${lastEntry}">
+                    <div class="form-group col-md-8">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Last Entry</div>
+                            <div class="panel-body">
+                                <p>Ciphered Text: <span th:text="${lastEntry.text}"></span></p>
+                                <p>Date Created: <span th:text="${lastEntry.creationDate}"></span></p>
+                                <p>Key Used: <span th:text="${lastEntry.key}"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row row" style="display: none" id="bruteForceOutputDiv">
+                    <div class="form-group col-md-8">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Brute Force Output</div>
+                            <div id="bruteForceOutput" class="panel-body">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <form id="bruteForceForm" style="display: none;" th:action="@{/bruteForce}" th:object="${cipherEntry}" action="#" method="post">
+                    <div class="form-row row">
+                        <div class="form-group col-md-5">
+                            <label>Alphabetic Characters</label>
+                            <input id="plainText" name="plainText" type="text" class="form-control" placeholder=""
+                                   pattern="[a-zA-Z]+" oninvalid="this.setCustomValidity('Enter Alphabet Only')" maxlength="32"/>
+                        </div>
+                    </div>
+                    <button id="bruteForceSubmit" class="btn btn-primary" type="submit">Perform Brute Force Attack</button>
+                </form>
+            </main>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            /*[+
+             
+             +]*/
+            $(document).ready(function () {
+                $('#cipherType').on('change', function () {
+                    var keyInput = $('#keyInput');
+
+                    if (this.value === 'CAESAR-SHIFT') {
+                        keyInput.attr("pattern", "^[0-9]|[0-2][0-9]|3[0-6]$");
+                        keyInput.attr("title", "Enter Number Only. 1 to 26.");
+                        keyInput.attr("required", "true");
+                        keyInput.removeAttr("disabled");
+                    }
+
+                    if (this.value === 'VIGENER') {
+                        keyInput.attr("pattern", "[a-zA-Z]+");
+                        keyInput.attr("title", "Enter Alphabet Only");
+                        keyInput.attr("required", "true");
+                        keyInput.removeAttr("disabled");
+                    }
+
+                    if (this.value === 'CAESAR-MONO') {
+                        keyInput.removeAttr("required");
+                        keyInput.attr("disabled", "true");
+                    }
+                });
+
+                var bruteForceForm = $('#bruteForceForm');
+                var bruteForceOutputDiv = $('#bruteForceOutputDiv');
+                var bruteForceOutput = $('#bruteForceOutput');
+                var lastEntryForm = $('#lastEntryForm');
+
+                $('#bruteForceButton').click(function () {
+                    bruteForceForm.show();
+                    bruteForceOutputDiv.hide();
+                    lastEntryForm.hide();
+                });
+
+                $('#bruteForceForm').on('submit', function (e) {
+                    e.preventDefault();
+                    bruteForceForm.hide();
+                    decode(0);
+                });
+
+                function decode(shift) {
+                    var data = {
+                        key: shift, cipherType: "CAESAR-SHIFT", plainText: $('#plainText').val()
+                    }
+                    $.ajax({
+                        url: "/bruteForce" || window.location.pathname,
+                        type: "POST",
+                        data: JSON.stringify(data),
+                        dataType: 'json',
+                        contentType: "application/json",
+                        success: function (data) {
+                            console.log("success", data);
+                            bruteForceOutput.append("Offset: " + shift + ". Result: " + data.response + '<br/>');
+                            if (shift < 26) {
+                                decode(++shift);
+                            }
+                            bruteForceOutputDiv.show();
+                        },
+                        error: function (jXHR, textStatus, errorThrown) {
+                            bruteForceOutput.append(errorThrown);
+                            bruteForceOutputDiv.show();
+                        }
+                    });
+                }
+            });
+            /*]]>*/
+        </script>
+
+
+    </body>
+</html>
