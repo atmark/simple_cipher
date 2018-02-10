@@ -1,6 +1,7 @@
 package my.cipher.controller;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import my.cipher.controller.forms.CipherForm;
@@ -54,6 +55,7 @@ public class SimpleController {
         final CipherEntry cipherEntry = new CipherEntry();
         final String encodedValue = cipher.encode(cipherForm.getPlainText());
         cipherEntry.setText(encodedValue);
+        cipherEntry.setType(cipherForm.getCipherType());
         cipherEntry.setKey(String.valueOf(cipherForm.getKey()));
         repo.save(cipherEntry);
         redirect.addFlashAttribute("globalMessage", "New Cipher text was save successfully.");
@@ -65,17 +67,19 @@ public class SimpleController {
 
     @RequestMapping(value = "/retrieve", method = RequestMethod.POST)
     public String retrieve(RedirectAttributes redirect) throws IOException {
-        final CipherEntry lastEntry = repo.findFirstByOrderByIdDesc().get();
-        LOG.info(String.format("RETRIEVE[%s]", lastEntry.toString()));
-        redirect.addFlashAttribute("lastEntry", lastEntry);
+        final Optional<CipherEntry> lastEntry = repo.findFirstByOrderByIdDesc();
+        if (lastEntry.isPresent()){
+            LOG.info(String.format("RETRIEVED[%s]", lastEntry.toString()));
+            redirect.addFlashAttribute("lastEntry", lastEntry.get());
+        }else{
+            redirect.addFlashAttribute("globalMessageError", "No recent saved entry. Database is empty");
+        }
         return "redirect:/";
     }
 
     @RequestMapping(value = "/bruteForce", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> bruteForce(@RequestBody CipherForm cipherForm, RedirectAttributes redirect) throws IOException {
-        redirect.addAttribute("lastEntry", repo.findFirstByOrderByIdDesc().get());
-
         Cipher cipher = determineCipherType(cipherForm);
         return ResponseEntity.ok(new StringResponse(cipher.decode(cipherForm.getPlainText())));
     }

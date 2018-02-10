@@ -34,8 +34,9 @@
         <div class="container">
             <main role="main" class="container">
                 <h1 class="mt-5">Test Name 1112345</h1>
-                <div class="alert alert-success alert-message" th:if="${globalMessage}" th:text="${globalMessage}">Some Success message</div>
-                <div class="alert alert-error alert-message" th:if="${globalMessageError}" th:text="${globalMessageError}">Some Error message</div>
+
+                <div class="alert alert-success" th:if="${globalMessage}"><strong th:text="${globalMessage}">Success!</strong><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a></div>
+                <div class="alert alert-info" th:if="${globalMessageError}"><strong th:text="${globalMessageError}">Success!</strong><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a></div>
 
                 <form th:action="@{/save}"
                       th:object="${cipherForm}" action="#" method="post">
@@ -79,6 +80,7 @@
                                 <p>Ciphered Text: <span th:text="${lastEntry.text}"></span></p>
                                 <p>Date Created: <span th:text="${lastEntry.creationDate}"></span></p>
                                 <p>Key Used: <span th:text="${lastEntry.key}"></span></p>
+                                <p>Cipher Scheme: <span th:text="${lastEntry.type}"></span></p>
                             </div>
                         </div>
                     </div>

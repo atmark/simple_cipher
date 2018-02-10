@@ -20,6 +20,9 @@ public class CipherEntry extends Auditable implements Serializable {
     @Column(nullable = true)
     private String key;
 
+    @Column(nullable = true)
+    private String type;
+
     public long getId() {
         return id;
     }
@@ -44,9 +47,25 @@ public class CipherEntry extends Auditable implements Serializable {
         this.key = key;
     }
 
-    @Override
-    public String toString() {
-        return "CipherEntry{" + "id=" + id + ", text=" + text + ", key=" + key + '}' + super.toString() + "\n";
+    public String getType() {
+        return type;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return "CipherEntry{" +
+                "id=" + id +
+                ", text='" + text + '\'' +
+                ", key='" + key + '\'' +
+                ", type='" + type + '\'' +
+                ", createdBy='" + createdBy + '\'' +
+                ", creationDate=" + creationDate +
+                ", lastModifiedBy='" + lastModifiedBy + '\'' +
+                ", lastModifiedDate=" + lastModifiedDate +
+                '}';
+    }
 }
