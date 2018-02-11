@@ -47,7 +47,7 @@
                             <div class="panel-body">
                                 <p>Ciphered Text: <span th:text="${savedEntry.text}"></span></p>
                                 <p>Date Created: <span th:text="${savedEntry.creationDate}"></span></p>
-                                <p>Key Used: <span th:text="${savedEntry.key}"></span></p>
+                                <p>Key Used: <span th:text="${savedEntry.key}" th:if="${savedEntry.key}"></span></p>
                                 <p>Cipher Scheme: <span th:text="${savedEntry.type}"></span></p>
                             </div>
                         </div>
@@ -63,6 +63,7 @@
                                 <option value="" selected="" disabled="">Please select</option>
                                 <option value="CAESAR">Caesar</option>
                                 <option value="CAESAR-SHIFT">Caesar - Shift</option>
+                                <option value="CAESAR-MONO">Caesar - Mono</option>
                                 <option value="VIGENER">Vigenère</option>
                             </select>
                         </div>
@@ -90,12 +91,15 @@
                 <div id="lastEntryForm" class="form-row row"  th:if="${lastEntry}">
                     <div class="form-group col-md-8">
                         <div class="panel panel-default">
-                            <div class="panel-heading">Last Entry</div>
+                            <div class="panel-heading">Last Entries</div>
                             <div class="panel-body">
-                                <p>Ciphered Text: <span th:text="${lastEntry.text}"></span></p>
-                                <p>Date Created: <span th:text="${lastEntry.creationDate}"></span></p>
-                                <p>Key Used: <span th:text="${lastEntry.key}"></span></p>
-                                <p>Cipher Scheme: <span th:text="${lastEntry.type}"></span></p>
+                                <div th:each="entry : ${lastEntries}">
+                                    <p>Ciphered Text: <span th:text="${entry.text}"></span></p>
+                                    <p>Date Created: <span th:text="${entry.creationDate}"></span></p>
+                                    <p>Key Used: <span th:text="${entry.key}"></span></p>
+                                    <p>Cipher Scheme: <span th:text="${entry.type}"></span></p>
+                                    <hr/>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -130,31 +134,41 @@
         <script th:inline="javascript">
             /*<![CDATA[*/
             /*[+
-             
+
              +]*/
             $(document).ready(function () {
+
                 $('#cipherType').on('change', function () {
                     var keyInput = $('#keyInput');
 
-                    if (this.value === 'CAESAR-SHIFT') {
-                        keyInput.attr("pattern", "^[0-9]|[0-2][0-9]|3[0-6]$");
-                        keyInput.attr("title", "Enter Number Only. 1 to 26.");
-                        keyInput.attr("required", "true");
-                        keyInput.removeAttr("disabled");
-                    }
-
-                    if (this.value === 'VIGENER') {
-                        keyInput.attr("pattern", "[a-zA-Z]+");
-                        keyInput.attr("title", "Enter Alphabet Only");
-                        keyInput.attr("required", "true");
-                        keyInput.removeAttr("disabled");
-                    }
-
-                    if (this.value === 'CAESAR') {
-                        keyInput.attr("pattern", "[0-3]+");
-                        keyInput.val(3);
-                        keyInput.removeAttr("required");
-                        keyInput.attr("disabled", "true");
+                    switch(this.value) {
+                        case 'CAESAR':
+                            keyInput.attr("pattern", "[0-3]+");
+                            keyInput.val(3);
+                            keyInput.removeAttr("required");
+                            keyInput.attr("disabled", "true");
+                            break;
+                        case 'CAESAR-MONO':
+                            keyInput.val("");
+                            keyInput.removeAttr("required");
+                            keyInput.attr("disabled", "true");
+                        break;
+                        case 'CAESAR-SHIFT':
+                            keyInput.val("");
+                            keyInput.attr("pattern", "^[0-9]|[0-2][0-9]|3[0-6]$");
+                            keyInput.attr("title", "Enter Number Only. 1 to 26.");
+                            keyInput.attr("required", "true");
+                            keyInput.removeAttr("disabled");
+                            break;
+                        case 'VIGENER':
+                            keyInput.val("");
+                            keyInput.attr("pattern", "[a-zA-Z]+");
+                            keyInput.attr("title", "Enter Alphabet Only");
+                            keyInput.attr("required", "true");
+                            keyInput.removeAttr("disabled");
+                            break;
+                        default:
+                            // Do nothing
                     }
                 });
 

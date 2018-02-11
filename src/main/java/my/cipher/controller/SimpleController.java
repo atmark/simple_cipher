@@ -1,30 +1,30 @@
 package my.cipher.controller;
 
-import java.io.IOException;
-import java.util.Optional;
-import java.util.logging.Logger;
-
 import my.cipher.controller.forms.CipherForm;
 import my.cipher.controller.forms.StringResponse;
 import my.cipher.persistence.model.CipherEntry;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import my.cipher.persistence.repo.CipherEntryRepository;
 import my.ciphers.types.CaesarShiftCipher;
 import my.ciphers.types.Cipher;
 import my.ciphers.types.MonoAlphabeticCipher;
 import my.ciphers.types.VigenerCipher;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.io.IOException;
+import java.util.Optional;
+import java.util.logging.Logger;
 
 @Controller
 public class SimpleController {
@@ -67,10 +67,11 @@ public class SimpleController {
     @RequestMapping(value = "/retrieve", method = RequestMethod.POST)
     public String retrieve(RedirectAttributes redirect) throws IOException {
         final Optional<CipherEntry> lastEntry = repo.findFirstByOrderByIdDesc();
-        if (lastEntry.isPresent()){
+        if (lastEntry.isPresent()) {
             LOG.info(String.format("RETRIEVED[%s]", lastEntry.toString()));
             redirect.addFlashAttribute("lastEntry", lastEntry.get());
-        }else{
+            redirect.addFlashAttribute("lastEntries", repo.findFirst3ByOrderByIdDesc());
+        } else {
             redirect.addFlashAttribute("globalMessageError", "No recent saved entry. Database is empty");
         }
         return "redirect:/";
@@ -84,18 +85,20 @@ public class SimpleController {
     }
 
     private Cipher determineCipherType(CipherForm cipherForm) throws NumberFormatException {
-        Cipher cipher = null;
-        if ("CAESAR-SHIFT".equals(cipherForm.getCipherType())) {
-            cipher = new CaesarShiftCipher(Integer.valueOf(cipherForm.getKey()));
+        switch (cipherForm.getCipherType()) {
+            case "CAESAR":
+                cipherForm.setKey("3");
+                return new CaesarShiftCipher(3);
+            case "CAESAR-SHIFT":
+                return new CaesarShiftCipher(Integer.valueOf(cipherForm.getKey()));
+            case "CAESAR-MONO":
+                cipherForm.setKey("");
+                return new MonoAlphabeticCipher();
+            case "VIGENER":
+                return new VigenerCipher(cipherForm.getKey());
+            default:
+                return null;
         }
-        if ("VIGENER".equals(cipherForm.getCipherType())) {
-            cipher = new VigenerCipher(cipherForm.getKey());
-        }
-        if ("CAESAR".equals(cipherForm.getCipherType())) {
-            cipher = new CaesarShiftCipher(3);
-            cipherForm.setKey("3");
-        }
-        return cipher;
     }
 
 }
