@@ -38,6 +38,21 @@
                 <div class="alert alert-success" th:if="${globalMessage}"><strong th:text="${globalMessage}">Success!</strong><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a></div>
                 <div class="alert alert-info" th:if="${globalMessageError}"><strong th:text="${globalMessageError}">Success!</strong><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a></div>
 
+                <div id="savedEntryForm" class="form-row row" th:if="${savedEntry}">
+                    <div id="savedEntryDiv" class="form-group col-md-8 panel-collapse in">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <a class="close" data-target="#savedEntryDiv" data-dismiss="alert" aria-label="close" href="#savedEntryDiv">&times;</a>Saved Entry
+                            </div>
+                            <div class="panel-body">
+                                <p>Ciphered Text: <span th:text="${savedEntry.text}"></span></p>
+                                <p>Date Created: <span th:text="${savedEntry.creationDate}"></span></p>
+                                <p>Key Used: <span th:text="${savedEntry.key}"></span></p>
+                                <p>Cipher Scheme: <span th:text="${savedEntry.type}"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <form th:action="@{/save}"
                       th:object="${cipherForm}" action="#" method="post">
 
@@ -46,8 +61,8 @@
                             <label>Cipher Scheme</label>
                             <select class="form-control" name="cipherType" id="cipherType">
                                 <option value="" selected="" disabled="">Please select</option>
+                                <option value="CAESAR">Caesar</option>
                                 <option value="CAESAR-SHIFT">Caesar - Shift</option>
-                                <option value="CAESAR-MONO">Caesar - Mono</option>
                                 <option value="VIGENER">Vigenère</option>
                             </select>
                         </div>
@@ -101,7 +116,7 @@
                         <div class="form-group col-md-5">
                             <label>Alphabetic Characters</label>
                             <input id="plainText" name="plainText" type="text" class="form-control" placeholder=""
-                                   pattern="[a-zA-Z]+" oninvalid="this.setCustomValidity('Enter Alphabet Only')" maxlength="32"/>
+                                   pattern="[a-zA-Z]+" title="Enter Alphabet Only" maxlength="32"/>
                         </div>
                     </div>
                     <button id="bruteForceSubmit" class="btn btn-primary" type="submit">Perform Brute Force Attack</button>
@@ -135,7 +150,9 @@
                         keyInput.removeAttr("disabled");
                     }
 
-                    if (this.value === 'CAESAR-MONO') {
+                    if (this.value === 'CAESAR') {
+                        keyInput.attr("pattern", "[0-3]+");
+                        keyInput.val(3);
                         keyInput.removeAttr("required");
                         keyInput.attr("disabled", "true");
                     }

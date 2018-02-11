@@ -52,15 +52,14 @@ public class SimpleController {
             redirect.addFlashAttribute("globalMessageError", "Invalid cipher type.");
         }
 
-        final CipherEntry cipherEntry = new CipherEntry();
+        CipherEntry cipherEntry = new CipherEntry();
         final String encodedValue = cipher.encode(cipherForm.getPlainText());
         cipherEntry.setText(encodedValue);
         cipherEntry.setType(cipherForm.getCipherType());
         cipherEntry.setKey(String.valueOf(cipherForm.getKey()));
-        repo.save(cipherEntry);
+        cipherEntry = repo.save(cipherEntry);
         redirect.addFlashAttribute("globalMessage", "New Cipher text was save successfully.");
-
-        redirect.addAttribute("", "");
+        redirect.addFlashAttribute("savedEntry", cipherEntry);
 
         return "redirect:/";
     }
@@ -92,8 +91,9 @@ public class SimpleController {
         if ("VIGENER".equals(cipherForm.getCipherType())) {
             cipher = new VigenerCipher(cipherForm.getKey());
         }
-        if ("CAESAR-MONO".equals(cipherForm.getCipherType())) {
-            cipher = new MonoAlphabeticCipher();
+        if ("CAESAR".equals(cipherForm.getCipherType())) {
+            cipher = new CaesarShiftCipher(3);
+            cipherForm.setKey("3");
         }
         return cipher;
     }
